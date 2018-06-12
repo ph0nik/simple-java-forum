@@ -3,12 +3,12 @@ package com.phonik.simpleforum.elements;
 import com.phonik.simpleforum.elements.service.SectionService;
 import com.phonik.simpleforum.elements.service.SectionServiceImpl;
 import com.phonik.simpleforum.exceptions.UserPrivilegesException;
+import com.phonik.simpleforum.privileges.AdminPrivileges;
 import com.phonik.simpleforum.privileges.ModeratorPrivileges;
 import com.phonik.simpleforum.privileges.service.ValidateUser;
 import com.phonik.simpleforum.privileges.service.ValidateUserImpl;
 import com.phonik.simpleforum.users.GeneralUser;
-import com.phonik.simpleforum.users.UserAdmin;
-import com.phonik.simpleforum.users.UserRegular;
+import com.phonik.simpleforum.users.UserType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,37 +22,38 @@ public class AbstractForumElementTest {
 
     @Before
     public void initTestSuite() {
-        admin = new UserAdmin("Forum Admin", "very_secret", "boss@ms.com");
+        admin = new GeneralUser();
+        admin.setUserType(UserType.ADMIN);
+        admin.setUserPrivileges(new AdminPrivileges());
+        admin.setUserName("Forum Admin");
+        admin.setUserPassword("very_secret");
+        admin.setUserMail("boss@ms.com");
         validateUser = new ValidateUserImpl();
         sectionService = new SectionServiceImpl();
     }
 
 
     @Test
-    public void createForumAndSection() {
-        ForumSection root = new ForumSection("Root forum page", "This is root forum page", admin);
-        System.out.println(root);
-
-    }
-
-    @Test
     public void checkParentsLists() {
         // create forum root
-        // ForumSection root = new ForumSection("Forum title", "root of forum", admin);
         ForumSection root = new ForumSection();
         root.setId(ForumRoot.FORUM_ROOT_ID);
         root.setTitle("Forum title");
         root.setDescription("root of forum");
         root.setAuthor(admin);
         root.setParentElement(root);
+        root.addCurrentToElementPath();
 
         int i = ForumRoot.FORUM_ROOT_ID + 1;
         // add two forum sections that belongs to root
         ForumSection filmy = new ForumSection("Filmy", "dyskusje na temat filmów", admin, root);
         filmy.setId(i);
+        filmy.addCurrentToElementPath();
+
         i++;
         ForumSection seriale = new ForumSection("Seriale", "dyskusje na temat seriali", admin, root);
         seriale.setId(i);
+
         i++;
         // add two sections that belongs to Filmy section
         ForumSection horrory = new ForumSection("Horrory", "dział horrorów", admin, filmy);

@@ -24,6 +24,7 @@ public class ForumReply extends AbstractForumElement {
     public ForumReply(ForumPost parentPost, String content, GeneralUser author) {
         this();
         setAuthor(author);
+        setElementType(ElementType.REPLY);
         this.content = content;
         this.parentPost = parentPost;
         parentPost.addPostReply(this);

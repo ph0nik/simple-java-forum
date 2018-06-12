@@ -39,6 +39,7 @@ public class ForumPost extends AbstractForumElement implements Serializable, Com
     public ForumPost(ForumSection parentSection, String title, String content, GeneralUser author) {
         this();
         setAuthor(author);
+        setElementType(ElementType.TOPIC);
         this.title = title;
         this.content = content;
         this.parentSection = parentSection;

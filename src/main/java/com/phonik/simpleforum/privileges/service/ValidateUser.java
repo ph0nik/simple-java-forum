@@ -2,6 +2,7 @@ package com.phonik.simpleforum.privileges.service;
 
 import com.phonik.simpleforum.elements.*;
 import com.phonik.simpleforum.users.GeneralUser;
+import org.springframework.stereotype.Component;
 
 public interface ValidateUser {
 

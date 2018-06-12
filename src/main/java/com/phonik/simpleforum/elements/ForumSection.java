@@ -9,8 +9,10 @@ import java.util.*;
 @Table(name = "forum_section")
 public class ForumSection extends AbstractForumElement {
 
-    @Transient
-    private Map<Integer, String> elementPath;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "path_list", joinColumns = @JoinColumn(name = "target_element_id"), inverseJoinColumns = @JoinColumn(name = "path_element_id"))
+    private List<PathElement> elementPath;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "sections_list", joinColumns = @JoinColumn(name = "section_parent_id"), inverseJoinColumns = @JoinColumn(name = "section_child_id"))
@@ -29,30 +31,27 @@ public class ForumSection extends AbstractForumElement {
     @Column(name = "section_desc")
     private String description;
 
-    // title, description, author, parent, create time, edit time
-
     public ForumSection() {
         super();
-        elementPath = new TreeMap<>();
-        sectionsList = new ArrayList<>();
-        postsList = new ArrayList<>();
-    }
-
-    public ForumSection(String title, String description, GeneralUser author) {
-        this();
-        setAuthor(author);
-        setId(ForumRoot.FORUM_ROOT_ID);
-        this.title = title;
-        this.description = description;
-        this.parentElement = this;
+        this.elementPath = new ArrayList<>();
+        this.sectionsList = new ArrayList<>();
+        this.postsList = new ArrayList<>();
     }
 
     public ForumSection(String title, String description, GeneralUser author, ForumSection parentElement) {
         this();
         setAuthor(author);
+        setElementType(ElementType.SECTION);
         this.title = title;
         this.description = description;
         this.parentElement = parentElement;
+        this.elementPath.addAll(parentElement.getElementPath());
+        this.elementPath.add(
+                new PathElement(
+                        parentElement.getId(),
+                        parentElement.getTitle(),
+                        parentElement.getCreationDate()
+                ));
         parentElement.addSection(this);
     }
 
@@ -67,12 +66,15 @@ public class ForumSection extends AbstractForumElement {
      */
     public Set<Integer> getParents() {
         Set<Integer> parents = new HashSet<>();
-        ForumSection parentSection = this.parentElement;
-        while (parentSection.getParentElement().getId() != parentSection.getId()) {
-            parents.add(parentSection.getId());
-            parentSection = parentSection.getParentElement();
+        for (PathElement pe : this.elementPath) {
+            parents.add(pe.getId());
         }
-        parents.add(parentSection.getId());
+//        ForumSection parentSection = this.parentElement;
+//        while (parentSection.getParentElement().getId() != parentSection.getId()) {
+//            parents.add(parentSection.getId());
+//            parentSection = parentSection.getParentElement();
+//        }
+//        parents.add(parentSection.getId());
         return parents;
     }
 
@@ -116,18 +118,22 @@ public class ForumSection extends AbstractForumElement {
         return sectionsList.remove(fs);
     }
 
-    // TODO
-    // after creating element db generates id number that is assign to object
-    // this id needs to be put inside this collection
-    public void addToElementPath(ForumSection forumElement) {
-        this.elementPath.put(forumElement.getId(), forumElement.getTitle());
+    /**
+     * Adds current element to element path
+     */
+    public void addCurrentToElementPath() {
+        PathElement pathElement = new PathElement();
+        pathElement.setId(this.getId());
+        pathElement.setName(this.title);
+        pathElement.setCreationDate(this.getCreationDate());
+        this.elementPath.add(pathElement);
     }
 
-    public Map<Integer, String> getElementPath() {
+    public List<PathElement> getElementPath() {
         return elementPath;
     }
 
-    public void setElementPath(Map<Integer, String> elementPath) {
+    public void setElementPath(List<PathElement> elementPath) {
         this.elementPath = elementPath;
     }
 
@@ -155,9 +161,22 @@ public class ForumSection extends AbstractForumElement {
         return parentElement;
     }
 
+    /**
+     * Adds parent element and path to this element
+     */
     public void setParentElement(ForumSection parentElement) {
+        if (this.getId() != parentElement.getId()) {
+            this.elementPath.clear();
+            this.elementPath.addAll(parentElement.getElementPath());
+            this.elementPath.add(
+                    new PathElement(
+                            parentElement.getId(),
+                            parentElement.getTitle(),
+                            parentElement.getCreationDate()
+                    ));
+            parentElement.addSection(this);
+        }
         this.parentElement = parentElement;
-        parentElement.addSection(this);
     }
 
     public String getTitle() {

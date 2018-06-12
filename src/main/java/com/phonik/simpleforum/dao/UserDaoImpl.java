@@ -31,9 +31,8 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public int addUser(GeneralUser user) {
-        int userId = 0;
         Session session = sessionFactory.getCurrentSession();
-        userId = (int) session.save(user);
+        int userId = (int) session.save(user);
         return userId;
     }
 

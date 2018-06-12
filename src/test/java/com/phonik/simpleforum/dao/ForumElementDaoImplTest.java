@@ -1,5 +1,6 @@
 package com.phonik.simpleforum.dao;
 
+import com.phonik.simpleforum.configuration.HibernateConfiguration;
 import com.phonik.simpleforum.elements.ForumSection;
 import com.phonik.simpleforum.elements.service.SectionService;
 import com.phonik.simpleforum.elements.service.SectionServiceImpl;
@@ -8,6 +9,7 @@ import com.phonik.simpleforum.exceptions.EmptyFieldsException;
 import com.phonik.simpleforum.exceptions.UserPrivilegesException;
 import com.phonik.simpleforum.users.GeneralUser;
 import com.phonik.simpleforum.users.service.UserService;
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,8 +24,7 @@ import static org.junit.Assert.assertTrue;
 @ContextConfiguration(classes = {SectionServiceImpl.class,
         ForumElementDaoImpl.class,
         UserDaoImpl.class,
-        UserService.class,
-        AdminDaoImpl.class})
+        UserService.class})
 public class ForumElementDaoImplTest {
 
     @Autowired

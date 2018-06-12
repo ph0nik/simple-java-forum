@@ -52,7 +52,9 @@ public class SectionController {
     public String submitNewSection(@RequestParam(value = "title") final String title,
                                    @RequestParam(value = "description") final String description,
                                    ModelAndView model) {
+
         ForumSection section = (ForumSection) model.getModel().get("section");
+
         System.out.println(description);
         return "redirect:/section/" + "id of newly added section";
     }

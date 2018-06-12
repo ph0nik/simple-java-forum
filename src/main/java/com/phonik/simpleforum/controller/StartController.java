@@ -32,9 +32,9 @@ public class StartController {
     @GetMapping(value = "forum")
     public ModelAndView initForum(ModelAndView modelAndView) {
         // check if there's user with type admin
-        boolean asd = userService.adminCheck();
-        if (asd) {
-            System.out.println(asd);
+        boolean adminPresent = userService.adminCheck();
+        if (adminPresent) {
+            System.out.println(adminPresent);
             // get the root section of forum
             ForumSection rootSection = sectionService.getRootSection();
 

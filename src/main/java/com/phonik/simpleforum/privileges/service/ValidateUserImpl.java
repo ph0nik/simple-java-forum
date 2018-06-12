@@ -6,11 +6,14 @@ import com.phonik.simpleforum.elements.ForumSection;
 import com.phonik.simpleforum.elements.AbstractForumElement;
 import com.phonik.simpleforum.privileges.UserPrivileges;
 import com.phonik.simpleforum.users.GeneralUser;
+import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
+@Component
 public class ValidateUserImpl implements ValidateUser {
 
     private Function<UserPrivileges, Boolean> newSection = UserPrivileges::isCreateNewSection;
@@ -77,16 +80,16 @@ public class ValidateUserImpl implements ValidateUser {
      * Determines if given user is allowed to perform given action on given forum element
      *
      * @param   user        user that performs action
-     * @param   forumReply  forum element
+     * @param   forumElement  forum element
      * @param   function    functional interface that with given UserPrivileges returns boolean value
      *
      * @return  true if user is allowed to perform action, false otherwise
      * */
     protected boolean validationWithFunction(GeneralUser user,
-                                           AbstractForumElement forumReply,
+                                           AbstractForumElement forumElement,
                                            Function<UserPrivileges, Boolean> function) {
-        sectionPath = new HashSet<>(forumReply.getParents());
-        sectionPath.add(forumReply.getId());
+        sectionPath = new HashSet<>(forumElement.getParents());
+        sectionPath.add(forumElement.getId());
         return sectionPath.stream()
                 .filter(id -> user.getUserPrivilegesMap().containsKey(id))
                 .anyMatch(id -> function.apply(user.getPrivilegesForSpecificElement(id)));

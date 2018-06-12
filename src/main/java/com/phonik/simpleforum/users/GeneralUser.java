@@ -54,6 +54,7 @@ public class GeneralUser implements Serializable, PrivilegesService  {
 
     public GeneralUser() {
         this.userPrivilegesMap = new TreeMap<>();
+        this.setUserCreated(LocalDateTime.now());
     }
 
     public GeneralUser(GeneralUser user) {
@@ -134,6 +135,11 @@ public class GeneralUser implements Serializable, PrivilegesService  {
 
     public void removePrivileges(AbstractForumElement element) {
         this.userPrivilegesMap.remove(element.getId());
+        manageUserType();
+    }
+
+    public void removePrivileges(int elementId) {
+        this.userPrivilegesMap.remove(elementId);
         manageUserType();
     }
 

@@ -61,7 +61,7 @@ public class GeneralUserTest {
         userRegular.setUserPrivileges(new ModeratorPrivileges(10));
         // removing given privileges
 
-//        userRegular.removePrivileges(10);
+        userRegular.removePrivileges(10);
         // check if user type is properly attached
         assertEquals(UserType.USER, userRegular.getUserType());
 

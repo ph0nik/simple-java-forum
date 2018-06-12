@@ -175,7 +175,7 @@ public class UserPrivileges implements Serializable {
                 ", editOwnReply=" + editOwnReply +
                 ", editAnyReply=" + editAnyReply +
                 ", deleteReply=" + deleteReply +
-                ", editSection=" + editSection +
+                ", updateSection=" + editSection +
                 ", deleteSection=" + deleteSection +
                 ", user=" + user.getUserName() +
                 '}';

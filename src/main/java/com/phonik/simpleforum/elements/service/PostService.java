@@ -2,6 +2,7 @@ package com.phonik.simpleforum.elements.service;
 
 import com.phonik.simpleforum.elements.ForumPost;
 import com.phonik.simpleforum.elements.ForumSection;
+import com.phonik.simpleforum.exceptions.UserPrivilegesException;
 import com.phonik.simpleforum.users.GeneralUser;
 
 public interface PostService {
@@ -11,11 +12,12 @@ public interface PostService {
      *
      * @param   postTitle   title of new post
      * @param   postContent content of new post
-     * @param   generalUser author of new section
+     * @param   author      author of new section
+     * @param   parentSection   parent section of element
      *
      * @return  newly addred ForumPost element
      * */
-    ForumPost newPost(String postTitle, String postContent, GeneralUser generalUser);
+    ForumPost addNewPost(String postTitle, String postContent, GeneralUser author, ForumSection parentSection) throws UserPrivilegesException;
 
     /**
      * edits existing ForumPost element
@@ -28,37 +30,41 @@ public interface PostService {
      * @param   postId      identifier for post to be edited
      * @param   postTitle   new title for existing post
      * @param   postContent new content for existing post
-     * @param   generalUser editor of given element
+     * @param   user        editor of given element
      *
      * @return  edited ForumPost element
      * */
-    ForumPost editPost(int postId, String postTitle, String postContent, GeneralUser generalUser);
+    ForumPost updatePost(int postId, String postTitle, String postContent, GeneralUser user) throws UserPrivilegesException;
 
     /**
      * deletes existing forum post
      *
      * @param   postId      identifier of post to be deleted
-     * @param   generalUser user that performs action
+     * @param   user        user that performs action
      *
      * @return  parent ForumSection element
      * */
-    ForumSection deletePost(int postId, GeneralUser generalUser);
+    ForumSection deletePost(int postId, GeneralUser user) throws UserPrivilegesException;
 
     /**
      * Flags given ForumPost element to be pinned on top of the parent section, pinned elements are shown
      * at the top of section and sorted separately from rest of the section children
      *
      * @param   postId  identifier of post to be pinned
+     * @param   user    user that performs action
      *
      * @return  parent ForumSection element
      * */
-    ForumSection pinPost(int postId);
+    ForumSection pinPost(int postId, GeneralUser user) throws UserPrivilegesException;
 
     /**
      * Flags given ForumPost element to be unpinned from the parent section
      *
      * @param   postId  identifier of post to be unpinned
+     * @param   user    user that performs action
+     *
+     * @return  parent section element
      * */
-    ForumSection unpinPost(int postId);
+    ForumSection unpinPost(int postId, GeneralUser user) throws UserPrivilegesException;
 
 }

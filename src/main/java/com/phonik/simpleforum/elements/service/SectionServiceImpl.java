@@ -1,7 +1,9 @@
 package com.phonik.simpleforum.elements.service;
 
 import com.phonik.simpleforum.dao.ForumElementDao;
-import com.phonik.simpleforum.elements.ForumRoot;
+import com.phonik.simpleforum.elements.ElementType;
+import com.phonik.simpleforum.elements.ForumPost;
+import com.phonik.simpleforum.elements.ForumReply;
 import com.phonik.simpleforum.elements.ForumSection;
 import com.phonik.simpleforum.exceptions.UserPrivilegesException;
 import com.phonik.simpleforum.privileges.service.ValidateUser;
@@ -10,27 +12,30 @@ import com.phonik.simpleforum.users.GeneralUser;
 import com.phonik.simpleforum.users.UserType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 
 @Service
+@Transactional
 public class SectionServiceImpl implements SectionService {
 
+    @Autowired
     private ValidateUser valid;
 
     @Autowired
     private ForumElementDao forumDao;
 
-    public SectionServiceImpl() {
-        valid = new ValidateUserImpl();
-    }
+//    public SectionServiceImpl() {
+//        valid = new ValidateUserImpl();
+//    }
 
-    // TODO set apart root section, either store it in separate table, or add enum to point to it
     @Override
+    @Transactional
     public ForumSection getRootSection() {
         ForumSection root = null;
         try {
-            root = forumDao.getForumSection(1);
+            root = forumDao.getRoot();
         } catch (NoSuchElementException ex) {
             System.out.println(ex.getMessage());
         }
@@ -38,32 +43,39 @@ public class SectionServiceImpl implements SectionService {
     }
 
     @Override
+    @Transactional
     public ForumSection createRoot(String rootTitle,
                                    String rootDescription,
                                    GeneralUser user) throws UserPrivilegesException {
-        ForumSection root;
-        if (user.getUserType() == UserType.ADMIN) {
-            root = new ForumSection();
-            root.setAuthor(user);
-            root.setId(ForumRoot.FORUM_ROOT_ID);
-            root.setTitle(rootTitle);
-            root.setDescription(rootDescription);
-            root.setParentElement(root);
-
-        } else {
-            throw new UserPrivilegesException("You have no permission to do this.");
+        ForumSection root = null;
+        if (getRootSection() == null) {
+            if (user.getUserType() == UserType.ADMIN) {
+                root = new ForumSection();
+                root.setAuthor(user);
+                root.setElementType(ElementType.ROOT);
+                root.setTitle(rootTitle);
+                root.setDescription(rootDescription);
+                root.setParentElement(root);
+                int i = forumDao.addForumElement(root);
+                root.setId(i);
+            } else {
+                throw new UserPrivilegesException("You have no permission to do this.");
+            }
         }
         return root;
     }
 
     @Override
+    @Transactional
     public ForumSection addNewSection(String sectionTitle,
                                       String sectionDescription,
                                       GeneralUser user,
-                                      ForumSection forumSection) throws UserPrivilegesException {
+                                      ForumSection parentSection) throws UserPrivilegesException {
         ForumSection section;
-        if (valid.canCreateNewSection(user, forumSection)) {
-            section = new ForumSection(sectionTitle, sectionDescription, user, forumSection);
+        if (valid.canCreateNewSection(user, parentSection)) {
+            section = new ForumSection(sectionTitle, sectionDescription, user, parentSection);
+            int i = forumDao.addForumElement(section);
+            section.setId(i);
         } else {
             throw new UserPrivilegesException("You have no permission to do this.");
         }
@@ -71,19 +83,29 @@ public class SectionServiceImpl implements SectionService {
     }
 
     @Override
-    public ForumSection deleteSection(int sectionId,
-                                      GeneralUser user,
-                                      ForumSection forumSection) {
-        if (valid.canDeleteSection(user, forumSection)) {
-            // TODO
+    @Transactional
+    public ForumSection updateSection(ForumSection forumSection, GeneralUser user) throws UserPrivilegesException {
+        if (valid.canEditSection(user, forumSection)) {
+            forumDao.updateForumElement(forumSection);
+            return forumDao.getForumSection(forumSection.getId());
+        } else {
+            throw new UserPrivilegesException("You have no permission to do this.");
         }
-        return null;
     }
 
+
     @Override
-    public ForumSection editSection(int sectionId,
-                                    GeneralUser user,
-                                    ForumSection forumSection) {
-        return null;
+    @Transactional
+    public ForumSection deleteSection(int sectionId,
+                              GeneralUser user) throws UserPrivilegesException {
+        ForumSection fetchedSectionId = forumDao.getForumSection(sectionId);
+        int parentId = fetchedSectionId.getParentElement().getId();
+        if (valid.canDeleteSection(user, fetchedSectionId.getParentElement())) {
+            forumDao.deleteForumElement(fetchedSectionId);
+            return forumDao.getForumSection(parentId);
+        } else {
+            throw new UserPrivilegesException("You have no permission to do this.");
+        }
     }
+
 }

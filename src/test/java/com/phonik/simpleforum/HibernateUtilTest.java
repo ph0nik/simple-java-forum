@@ -1,12 +1,10 @@
 package com.phonik.simpleforum;
 
-import com.phonik.simpleforum.dao.AdminDaoImpl;
 import com.phonik.simpleforum.dao.UserDao;
 import com.phonik.simpleforum.exceptions.EmailExistException;
 import com.phonik.simpleforum.exceptions.EmptyFieldsException;
 import com.phonik.simpleforum.privileges.BanService;
 import com.phonik.simpleforum.users.GeneralUser;
-import com.phonik.simpleforum.users.UserRegular;
 import com.phonik.simpleforum.users.service.UserService;
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -20,7 +18,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class) // lets run test with spring
 // points to class that has to be autowired or to configuration class that points to other classess
-@ContextConfiguration(classes = {UserService.class, AdminDaoImpl.class})
+@ContextConfiguration(classes = {UserService.class})
 public class HibernateUtilTest {
 
     private SessionFactory sf;
@@ -39,7 +37,7 @@ public class HibernateUtilTest {
     @Test
     public void createDbAndInsertData() {
         // create sample user
-        UserRegular regularUser = new UserRegular();
+        GeneralUser regularUser = new GeneralUser();
         regularUser.setUserName("Tom");
         regularUser.setUserMail("bee@hive.com");
         regularUser.setUserPassword("unknown");
@@ -48,7 +46,7 @@ public class HibernateUtilTest {
         userDao.addUser(regularUser);
 
         // retrieve user
-        UserRegular userReturned = (UserRegular) userDao.selectUser(1);
+        GeneralUser userReturned = (GeneralUser) userDao.selectUser(1);
 
         // check if user is allowed to delete posts
         boolean deletePost = userReturned.getPrivilegesForSpecificElement(0).isDeletePost();

@@ -1,14 +1,14 @@
 package com.phonik.simpleforum.dao;
 
 import com.phonik.simpleforum.HibernateUtil;
-import com.phonik.simpleforum.elements.AbstractForumElement;
-import com.phonik.simpleforum.elements.ForumPost;
-import com.phonik.simpleforum.elements.ForumSection;
+import com.phonik.simpleforum.elements.*;
+import com.phonik.simpleforum.users.GeneralUser;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.NoSuchElementException;
@@ -17,47 +17,43 @@ import java.util.Optional;
 @Repository
 public class ForumElementDaoImpl implements ForumElementDao {
 
-    private SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+//    private SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+
+    @Autowired
+    private SessionFactory sessionFactory;
+
+    @Override
+    public ForumSection getRoot() {
+        Session session = sessionFactory.getCurrentSession();
+        String hql = "FROM ForumSection FS WHERE FS.elementType = :element_type";
+        Query query = session.createQuery(hql)
+                .setParameter("element_type", ElementType.ROOT);
+        Optional<Object> singleResult = Optional.ofNullable(query.getSingleResult());
+        return (ForumSection) singleResult.orElseThrow(() -> new NoSuchElementException("This forum has no root element"));
+    }
 
     @Override
     public int addForumElement(AbstractForumElement forumElement) {
-        int insertId = 0;
-        try (final Session session = sessionFactory.openSession()){
-            session.beginTransaction();
-            insertId = (int) session.save(forumElement);
-            session.getTransaction().commit();
-        } catch (HibernateException he) {
-
-        }
-        return insertId;
+        Session session = sessionFactory.getCurrentSession();
+        return (int) session.save(forumElement);
     }
 
     @Override
     public void updateForumElement(AbstractForumElement forumElement) {
-        try (final Session session = sessionFactory.openSession()){
-            session.beginTransaction();
-            session.update(forumElement);
-            session.getTransaction().commit();
-        } catch (HibernateException he) {
-
-        }
+        Session session = sessionFactory.getCurrentSession();
+        session.update(forumElement);
     }
 
     @Override
     public void deleteForumElement(AbstractForumElement forumElement) {
-        try (final Session session = sessionFactory.openSession()){
-            session.beginTransaction();
-            session.delete(forumElement);
-            session.getTransaction().commit();
-        } catch (HibernateException he) {
-
-        }
+        Session session = sessionFactory.getCurrentSession();
+        session.delete(forumElement);
     }
 
     @Override
     public ForumSection getForumSection(int id) throws NoSuchElementException {
         ForumSection section = null;
-        try (final Session session = sessionFactory.openSession()){
+        try (final Session session = sessionFactory.openSession()) {
             String hql = "FROM ForumSection FS WHERE FS.id = :section_id";
             Query query = session.createQuery(hql).setParameter("section_id", id);
             Optional<Object> result = Optional.ofNullable(query.uniqueResult());
@@ -81,6 +77,11 @@ public class ForumElementDaoImpl implements ForumElementDao {
 
     @Override
     public ForumPost getForumPost(int id) {
+        return null;
+    }
+
+    @Override
+    public ForumReply getForumReply(int id) {
         return null;
     }
 

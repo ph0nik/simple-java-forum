@@ -21,6 +21,10 @@ public abstract class AbstractForumElement implements Serializable {
     @Column(name = "element_id", unique = true, nullable = false)
     private int id; // element id
 
+    @Column(name = "element_type")
+    @Enumerated(EnumType.STRING)
+    private ElementType elementType;
+
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Fetch(FetchMode.SELECT)
     @PrimaryKeyJoinColumn
@@ -39,7 +43,14 @@ public abstract class AbstractForumElement implements Serializable {
 
     protected AbstractForumElement() {
         creationDate = LocalDateTime.now();
+    }
 
+    public ElementType getElementType() {
+        return elementType;
+    }
+
+    public void setElementType(ElementType elementType) {
+        this.elementType = elementType;
     }
 
     public abstract Set<Integer> getParents();

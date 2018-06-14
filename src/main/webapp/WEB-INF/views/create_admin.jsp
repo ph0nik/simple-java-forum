@@ -8,6 +8,8 @@ pageEncoding="ISO-8859-1"%>
 
 </head>
 <body>
+<p>Administrator registration page</p>
+<p>${message}</p>
 <form method="post" action="/admin/create" id="user">
     Admin Name<br>
     <input type="text" name="username" required><br>

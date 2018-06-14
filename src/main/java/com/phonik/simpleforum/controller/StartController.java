@@ -4,6 +4,7 @@ import com.phonik.simpleforum.elements.ForumSection;
 import com.phonik.simpleforum.elements.service.SectionService;
 import com.phonik.simpleforum.exceptions.EmailExistException;
 import com.phonik.simpleforum.exceptions.EmptyFieldsException;
+import com.phonik.simpleforum.exceptions.UserPrivilegesException;
 import com.phonik.simpleforum.users.GeneralUser;
 import com.phonik.simpleforum.users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class StartController {
@@ -23,6 +25,7 @@ public class StartController {
     private SectionService sectionService;
 
     private boolean hasAdmin = false;
+    private String message;
 
     /**
      * Starting point of the whole forum, method checks for two elements that must be present to render the view,
@@ -32,44 +35,39 @@ public class StartController {
     @GetMapping(value = "forum")
     public ModelAndView initForum(ModelAndView modelAndView) {
         // check if there's user with type admin
-        boolean adminPresent = userService.adminCheck();
-        if (adminPresent) {
-            System.out.println(adminPresent);
-            // get the root section of forum
-            ForumSection rootSection = sectionService.getRootSection();
-
-            // add root object to model so it can be rendered within jsp
-            modelAndView.addObject("root", rootSection);
-
-            // set the file name to render
+        ForumSection root = sectionService.getRootSection();
+        if (root != null) {
+            modelAndView.addObject("root", root);
             modelAndView.setViewName("section");
-//            modelAndView.setViewName("redirect:section/1");
         } else {
-            // admin not found, redirect to create new user
-            modelAndView.setViewName("create_admin");
+            boolean adminPresent = userService.adminCheck();
+            if (adminPresent) {
+                // login as admin
+                message = "Please login as administrator";
+                modelAndView.addObject("message", message);
+
+//                System.out.println(model.asMap().get("userName"));
+                modelAndView.setViewName("login");
+            } else {
+                // register administrator
+                message = "Register as administrator";
+                modelAndView.addObject("message", message);
+                modelAndView.setViewName("create_admin");
+            }
         }
-        // check if admin exist, if not prompt to create admin
-        // check if forum root exists, if not prompt to create root section
         return modelAndView;
     }
 
-//    @GetMapping(value = "admin/create")
-//    public String createAdmin() {
-//        return "create_admin";
-//    }
 
     @PostMapping(value = "admin/create")
     public ModelAndView registerUser(@RequestParam(value = "username") final String username,
                                      @RequestParam(value = "pass") final String password,
                                      @RequestParam(value = "email") final String email,
-                                     ModelAndView modelAndView) {
+                                     ModelAndView modelAndView, RedirectAttributes redirectAttributes) {
         try {
             GeneralUser newUser = userService.createNewAdmin(username, password, email);
-            System.out.println(newUser);
-
-            System.out.println("admin chk: " + userService.adminCheck());
-            modelAndView.addObject("user", newUser);
-            modelAndView.setViewName("redirect:root/create");
+            redirectAttributes.addFlashAttribute("userName", newUser);
+            modelAndView.setViewName("redirect:/forum");
         } catch (EmptyFieldsException | EmailExistException e) {
             System.out.println(e.getMessage());
             modelAndView.addObject("errorMessage", e.getMessage());
@@ -78,15 +76,36 @@ public class StartController {
         return modelAndView;
     }
 
+    /**
+     * Opens root element creation form -> create_root.jsp
+     * */
     @GetMapping(value = "root/create")
     public String getRootCreateForm(ModelAndView modelAndView) {
-        System.out.println(modelAndView.getModel().get("user"));
         return "create_root";
     }
 
+    // creates temp admin user
+    private GeneralUser getTestAdmin() throws EmptyFieldsException, EmailExistException {
+        return userService.createNewAdmin("testAdmin", "adminpass", "adminemail");
+    }
+
+    // root forum element creation method
     @PostMapping(value = "root/create")
-    public String createRootSection() {
-        return "";
+    public ModelAndView createRootSection(@RequestParam(value = "title") String rootTitle,
+                                           @RequestParam(value = "description") String rootDescription,
+                                           ModelAndView modelAndView) {
+        GeneralUser admin = null;
+        try {
+            // create sample admin user and main forum element
+            admin = getTestAdmin();
+            sectionService.createRoot(rootTitle, rootDescription, admin);
+        } catch (EmptyFieldsException | EmailExistException e) {
+            e.printStackTrace();
+        } catch (UserPrivilegesException e) {
+            e.printStackTrace();
+        }
+        modelAndView.setViewName("redirect:/forum");
+        return modelAndView;
     }
 
 }

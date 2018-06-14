@@ -6,7 +6,6 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "PRIVILEGES")
 public class RegularPrivileges extends UserPrivileges {
 
     // TODO update new parameters

@@ -9,8 +9,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.NoResultException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -25,11 +27,16 @@ public class ForumElementDaoImpl implements ForumElementDao {
     @Override
     public ForumSection getRoot() {
         Session session = sessionFactory.getCurrentSession();
+        ForumSection root = null;
         String hql = "FROM ForumSection FS WHERE FS.elementType = :element_type";
         Query query = session.createQuery(hql)
                 .setParameter("element_type", ElementType.ROOT);
-        Optional<Object> singleResult = Optional.ofNullable(query.getSingleResult());
-        return (ForumSection) singleResult.orElseThrow(() -> new NoSuchElementException("This forum has no root element"));
+        try {
+            root = (ForumSection) query.getSingleResult();
+        } catch (NoResultException ex) {
+            System.out.println("No result found");
+        }
+        return root;
     }
 
     @Override

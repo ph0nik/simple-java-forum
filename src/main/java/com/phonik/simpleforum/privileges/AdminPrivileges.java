@@ -2,6 +2,9 @@ package com.phonik.simpleforum.privileges;
 
 import com.phonik.simpleforum.elements.ForumRoot;
 
+import javax.persistence.Entity;
+
+@Entity
 public class AdminPrivileges extends UserPrivileges {
 
     public AdminPrivileges() {

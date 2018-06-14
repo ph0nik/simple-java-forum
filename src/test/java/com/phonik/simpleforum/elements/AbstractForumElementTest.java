@@ -83,7 +83,7 @@ public class AbstractForumElementTest {
         // checks if nested element is not child to given section element
         assertFalse(matrix1.getParents().contains(seriale.getId()));
 
-        UserRegular user = new UserRegular();
+        GeneralUser user = new GeneralUser();
 
         // does regular user can create new section
         assertFalse(validateUser.canCreateNewSection(user, filmy));

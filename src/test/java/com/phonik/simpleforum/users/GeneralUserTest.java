@@ -13,12 +13,12 @@ import static org.junit.Assert.*;
 
 public class GeneralUserTest {
 
-    private UserRegular userRegular;
+    private GeneralUser userRegular;
     private BanService userService;
 
     @Before
     public void initTest() {
-        userRegular = new UserRegular("Donald Duck", "kwack", "donald@disney.com");
+        userRegular = new GeneralUser("Donald Duck", "kwack", "donald@disney.com");
         userService = new UserService();
     }
 
@@ -33,7 +33,7 @@ public class GeneralUserTest {
     public void testModeratorParameters() {
         int forumScope = 12;
         int forumRoot = ForumRoot.FORUM_ROOT_ID;
-        UserRegular userModerator = new UserRegular("Piggy", "ilovekermit", "hotty@hensons.com");
+        GeneralUser userModerator = new GeneralUser("Piggy", "ilovekermit", "hotty@hensons.com");
         userModerator.setUserPrivileges(new ModeratorPrivileges(forumScope));
         boolean editAnyPost = userModerator.getPrivilegesForSpecificElement(forumScope).isEditAnyPost();
         // check if moderator is allowed to edit posts within given scope

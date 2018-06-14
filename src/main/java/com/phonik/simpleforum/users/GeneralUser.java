@@ -57,6 +57,13 @@ public class GeneralUser implements Serializable, PrivilegesService  {
         this.setUserCreated(LocalDateTime.now());
     }
 
+    public GeneralUser(String name, String password, String email) {
+        this();
+        this.userName = name;
+        this.userPassword = password;
+        this.userMail = email;
+    }
+
     public GeneralUser(GeneralUser user) {
         this.userId = user.getUserId();
         this.userType = user.getUserType();

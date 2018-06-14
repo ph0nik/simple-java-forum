@@ -33,13 +33,7 @@ public class SectionServiceImpl implements SectionService {
     @Override
     @Transactional
     public ForumSection getRootSection() {
-        ForumSection root = null;
-        try {
-            root = forumDao.getRoot();
-        } catch (NoSuchElementException ex) {
-            System.out.println(ex.getMessage());
-        }
-        return root;
+        return forumDao.getRoot();
     }
 
     @Override

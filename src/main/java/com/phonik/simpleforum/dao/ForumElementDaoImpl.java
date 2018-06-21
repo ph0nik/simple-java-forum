@@ -1,15 +1,12 @@
 package com.phonik.simpleforum.dao;
 
-import com.phonik.simpleforum.HibernateUtil;
 import com.phonik.simpleforum.elements.*;
-import com.phonik.simpleforum.users.GeneralUser;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.NoResultException;
@@ -33,6 +30,9 @@ public class ForumElementDaoImpl implements ForumElementDao {
                 .setParameter("element_type", ElementType.ROOT);
         try {
             root = (ForumSection) query.getSingleResult();
+            Hibernate.initialize(root.getSectionsList());
+            Hibernate.initialize(root.getPostsList());
+            Hibernate.initialize(root.getElementPath());
         } catch (NoResultException ex) {
             System.out.println("No result found");
         }
@@ -40,9 +40,10 @@ public class ForumElementDaoImpl implements ForumElementDao {
     }
 
     @Override
-    public int addForumElement(AbstractForumElement forumElement) {
+    public long addForumElement(AbstractForumElement forumElement) {
         Session session = sessionFactory.getCurrentSession();
-        return (int) session.save(forumElement);
+        System.out.println(forumElement.getAuthor().getUserName());
+        return (long) session.save(forumElement);
     }
 
     @Override
@@ -58,7 +59,7 @@ public class ForumElementDaoImpl implements ForumElementDao {
     }
 
     @Override
-    public ForumSection getForumSection(int id) throws NoSuchElementException {
+    public ForumSection getForumSection(long id) throws NoSuchElementException {
         ForumSection section = null;
         try (final Session session = sessionFactory.openSession()) {
             String hql = "FROM ForumSection FS WHERE FS.id = :section_id";
@@ -69,12 +70,7 @@ public class ForumElementDaoImpl implements ForumElementDao {
             Hibernate.initialize(section.getPostsList());
             Hibernate.initialize(section.getSectionsList());
             Hibernate.initialize(section.getAuthor());
-            Hibernate.initialize(section.getAuthor().getUserPrivilegesMap());
             Hibernate.initialize(section.getEditor());
-            if (section.getEditor() != null) {
-                Hibernate.initialize(section.getEditor().getUserPrivilegesMap());
-            }
-
 
         } catch (HibernateException he) {
 
@@ -83,13 +79,34 @@ public class ForumElementDaoImpl implements ForumElementDao {
     }
 
     @Override
-    public ForumPost getForumPost(int id) {
-        return null;
+    public ForumPost getForumPost(long id) {
+        ForumPost post = null;
+        try (final Session session = sessionFactory.openSession()) {
+            String hql = "FROM ForumPost FP WHERE FP.id = :post_id";
+            Query query = session.createQuery(hql).setParameter("post_id", id);
+            Optional<Object> singleResult = Optional.ofNullable(query.getSingleResult());
+            post = (ForumPost) singleResult.orElseThrow(() -> new NoSuchElementException("No element with given id found :: " + id));
+            Hibernate.initialize(post.getParents());
+            Hibernate.initialize(post.getPostReplysList());
+        } catch (HibernateException he) {
+
+        }
+        return post;
     }
 
     @Override
-    public ForumReply getForumReply(int id) {
-        return null;
+    public ForumReply getForumReply(long id) {
+        ForumReply reply = null;
+        try (final Session session = sessionFactory.openSession()) {
+            String hql = "SELECT parentPost FROM ForumReply FR WHERE FR.id = :reply_id";
+            Query query = session.createQuery(hql).setParameter("reply_id", id);
+            Optional<Object> singleResult = Optional.ofNullable(query.getSingleResult());
+            reply = (ForumReply) singleResult.orElseThrow(() -> new NoSuchElementException("No element with given id found :: " + id));
+            Hibernate.initialize(reply.getParents());
+        } catch (HibernateException he) {
+
+        }
+        return reply;
     }
 
 }

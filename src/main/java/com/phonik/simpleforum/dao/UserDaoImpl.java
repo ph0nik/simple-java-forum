@@ -58,7 +58,7 @@ public class UserDaoImpl implements UserDao {
         Optional<Object> singleResult = Optional.ofNullable(query.uniqueResult());
         GeneralUser user = (GeneralUser) singleResult.orElseThrow(() -> new NoSuchElementException("No user with id :: " + id));
         // additional initialization is needed for lazy fetched properties
-        Hibernate.initialize(user.getUserPrivilegesMap());
+//        Hibernate.initialize(user.getUserPrivilegesMap());
         return user;
     }
 

@@ -3,10 +3,7 @@ package com.phonik.simpleforum.users.service;
 import com.phonik.simpleforum.dao.UserDao;
 import com.phonik.simpleforum.exceptions.EmailExistException;
 import com.phonik.simpleforum.exceptions.EmptyFieldsException;
-import com.phonik.simpleforum.privileges.AdminPrivileges;
-import com.phonik.simpleforum.privileges.BanService;
-import com.phonik.simpleforum.privileges.RegularPrivileges;
-import com.phonik.simpleforum.privileges.UserPrivileges;
+import com.phonik.simpleforum.privileges.*;
 import com.phonik.simpleforum.users.GeneralUser;
 import com.phonik.simpleforum.users.UserType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +66,7 @@ public class UserService implements BanService {
             GeneralUser user = new GeneralUser();
             user.setUserType(type);
             user.setChildClassName(this.getClass().getSimpleName());
-            user.setUserPrivileges(privileges);
+            user.setPrivileges(new ElementPrivileges(UserType.USER, 0));
             user.setUserCreated(LocalDateTime.now());
             user.setUserName(name);
             user.setUserPassword(password);
@@ -77,7 +74,6 @@ public class UserService implements BanService {
             user.setBanLiftDate(LocalDateTime.now());
             int i = userDao.addUser(user);
             user.setUserId(i);
-//            return usersRepository.save(user);
             return user;
         }
 
@@ -146,14 +142,12 @@ public class UserService implements BanService {
                 .plusHours(hours);
         user.setTemporarilyBanned(true);
         user.setBanLiftDate(expDate);
-        user.setUserType(UserType.BANNED);
         userDao.updateUser(user);
     }
 
     @Override
     public void banUser(GeneralUser user) {
         user.setPermanentlyBanned(true);
-        user.setUserType(UserType.BANNED);
         userDao.updateUser(user);
     }
 
@@ -162,7 +156,6 @@ public class UserService implements BanService {
         user.setBanLiftDate(LocalDateTime.now());
         user.setPermanentlyBanned(false);
         user.setTemporarilyBanned(false);
-        user.setUserType(UserType.USER);
         userDao.updateUser(user);
     }
 }

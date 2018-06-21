@@ -31,8 +31,8 @@ public class ForumReply extends AbstractForumElement {
     }
 
     @Override
-    public Set<Integer> getParents() {
-        Set<Integer> parents = new HashSet<>();
+    public Set<Long> getParents() {
+        Set<Long> parents = new HashSet<>();
         parents.addAll(this.parentPost.getParents());
         parents.add(this.parentPost.getId());
         return parents;

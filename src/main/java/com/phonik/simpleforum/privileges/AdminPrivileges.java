@@ -9,7 +9,7 @@ public class AdminPrivileges extends UserPrivileges {
 
     public AdminPrivileges() {
 
-        super(ForumRoot.FORUM_ROOT_ID);
+        super();
         setCreateNewPost(true);
         setDeletePost(true);
         setEditAnyPost(true);

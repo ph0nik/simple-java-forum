@@ -28,7 +28,7 @@ public class ValidateUserImpl implements ValidateUser {
     private Function<UserPrivileges, Boolean> editAnyReply = UserPrivileges::isEditAnyReply;
     private Function<UserPrivileges, Boolean> deleteReply = UserPrivileges::isDeleteReply;
 
-    private Set<Integer> sectionPath;
+    private Set<Long> sectionPath;
 
 
     @Override
@@ -90,9 +90,10 @@ public class ValidateUserImpl implements ValidateUser {
                                            Function<UserPrivileges, Boolean> function) {
         sectionPath = new HashSet<>(forumElement.getParents());
         sectionPath.add(forumElement.getId());
-        return sectionPath.stream()
-                .filter(id -> user.getUserPrivilegesMap().containsKey(id))
-                .anyMatch(id -> function.apply(user.getPrivilegesForSpecificElement(id)));
+        return true;
+//        return sectionPath.stream()
+//                .filter(id -> user.getUserPrivilegesMap().containsKey(id))
+//                .anyMatch(id -> function.apply(user.getPrivilegesForSpecificElement(id)));
     }
 
 }

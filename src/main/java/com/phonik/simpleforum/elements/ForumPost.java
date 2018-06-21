@@ -46,9 +46,9 @@ public class ForumPost extends AbstractForumElement implements Serializable, Com
         parentSection.addPost(this);
     }
 
-    public Set<Integer> getParents() {
+    public Set<Long> getParents() {
         ForumSection parent = this.parentSection;
-        Set<Integer> parentSet = new TreeSet<>();
+        Set<Long> parentSet = new TreeSet<>();
         parentSet.addAll(parent.getParents());
         parentSet.add(parent.getId());
         return parentSet;

@@ -1,6 +1,7 @@
 package com.phonik.simpleforum.users;
 
 import com.phonik.simpleforum.elements.AbstractForumElement;
+import com.phonik.simpleforum.privileges.ElementPrivileges;
 import com.phonik.simpleforum.privileges.PrivilegesService;
 import com.phonik.simpleforum.privileges.UserPrivileges;
 
@@ -8,23 +9,24 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 //@MappedSuperclass
 @Entity
 @Table(name = "user")
 // check if inheritance needed
 //@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class GeneralUser implements Serializable, PrivilegesService  {
+public class GeneralUser implements Serializable {
 
     @Column(name = "user_type")
+    @Enumerated(EnumType.STRING)
     private UserType userType;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true, nullable = false)
+    @Column(name = "user_id", unique = true, nullable = false)
     private int userId;
+
     @Column(name = "user_name", unique = true)
     private String userName;
     @Column(name = "user_mail", unique = true)
@@ -35,7 +37,7 @@ public class GeneralUser implements Serializable, PrivilegesService  {
     private boolean permanentlyBanned;
     @Column(name = "user_temp_ban")
     private boolean temporarilyBanned;
-    @Column(name = "a_user_created")
+    @Column(name = "user_created")
     private LocalDateTime userCreated;
     @Column(name = "ban_lift_date")
     private LocalDateTime banLiftDate;
@@ -44,16 +46,15 @@ public class GeneralUser implements Serializable, PrivilegesService  {
 //    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 //    private Set<Role> roles;
 
-    // TODO problem z EAGER LAZY
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-    @MapKey(name = "privilegesScope")
-    private Map<Integer, UserPrivileges> userPrivilegesMap;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_priv", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "priv_id"))
+    private List<ElementPrivileges> privileges;
 
     @Transient
     private String childClassName;
 
     public GeneralUser() {
-        this.userPrivilegesMap = new TreeMap<>();
+        this.privileges = new ArrayList<>();
         this.setUserCreated(LocalDateTime.now());
     }
 
@@ -73,7 +74,6 @@ public class GeneralUser implements Serializable, PrivilegesService  {
         this.permanentlyBanned = user.isPermanentlyBanned();
         this.temporarilyBanned = user.isTemporarilyBanned();
         this.banLiftDate = user.getBanLiftDate();
-        this.userPrivilegesMap = user.getUserPrivilegesMap();
     }
 
     public String getChildClassName() {
@@ -132,39 +132,27 @@ public class GeneralUser implements Serializable, PrivilegesService  {
         this.userPassword = userPassword;
     }
 
-    public Map<Integer, UserPrivileges> getUserPrivilegesMap() {
-        return userPrivilegesMap;
+    public List<ElementPrivileges> getPrivileges() {
+        return privileges;
     }
 
-    public UserPrivileges getPrivilegesForSpecificElement(int el) {
-        return getUserPrivilegesMap().get(el);
+    public void setPrivileges(List<ElementPrivileges> privileges) {
+        this.privileges = privileges;
     }
 
-    public void removePrivileges(AbstractForumElement element) {
-        this.userPrivilegesMap.remove(element.getId());
-        manageUserType();
-    }
-
-    public void removePrivileges(int elementId) {
-        this.userPrivilegesMap.remove(elementId);
-        manageUserType();
-    }
-
-    protected void manageUserType() {
-        if (userType != UserType.ADMIN) {
-            userType = (getUserPrivilegesMap().size() > 1) ? UserType.MODERATOR : UserType.USER;
+    public void setPrivileges(ElementPrivileges privileges) {
+        if (!this.privileges.contains(privileges)) {
+            this.privileges.add(privileges);
         }
     }
 
-    public void setUserPrivilegesMap(Map<Integer, UserPrivileges> userPrivilegesMap) {
-        this.userPrivilegesMap = userPrivilegesMap;
-    }
+//    protected void manageUserType() {
+//        if (userType != UserType.ADMIN) {
+//            userType = (getUserPrivilegesMap().size() > 1) ? UserType.MODERATOR : UserType.USER;
+//        }
+//    }
 
-    public void setUserPrivileges(UserPrivileges userPrivileges) {
-        userPrivilegesMap.put(userPrivileges.getPrivilegesScope(), userPrivileges);
-        manageUserType();
-        userPrivileges.setUser(this);
-    }
+
 
     public boolean isPermanentlyBanned() {
         return permanentlyBanned;
@@ -201,11 +189,8 @@ public class GeneralUser implements Serializable, PrivilegesService  {
                 ", permanentlyBanned=" + permanentlyBanned +
                 ", temporarilyBanned=" + temporarilyBanned +
                 ", banLiftDate=" + banLiftDate +
-                ", userPrivilegesMap=" + userPrivilegesMap +
                 ", userCreated=" + userCreated +
                 ", childClassName='" + childClassName + '\'' +
                 '}';
     }
-
-
 }

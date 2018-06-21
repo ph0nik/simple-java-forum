@@ -29,7 +29,7 @@ public class PostServiceImpl implements PostService {
         ForumPost post;
         if (valid.canCreateNewPost(author, parentSection)) {
             post = new ForumPost(parentSection, postTitle, postContent, author);
-            int i = forumDao.addForumElement(post);
+            long i = forumDao.addForumElement(post);
             post.setId(i);
             return post;
         } else {
@@ -59,7 +59,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public ForumSection deletePost(int postId, GeneralUser user) throws UserPrivilegesException {
         ForumPost fetchedPost = forumDao.getForumPost(postId);
-        int parentId = fetchedPost.getParentSection().getId();
+        long parentId = fetchedPost.getParentSection().getId();
         if (valid.canDeletePost(user, fetchedPost)) {
             forumDao.deleteForumElement(fetchedPost);
             return forumDao.getForumSection(parentId);

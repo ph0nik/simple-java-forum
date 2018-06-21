@@ -1,6 +1,7 @@
 package com.phonik.simpleforum.elements;
 
 import com.phonik.simpleforum.users.GeneralUser;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -16,24 +17,27 @@ public abstract class AbstractForumElement implements Serializable {
     // all elements of collection in ascending order / by creation date
     @Column(name = "element_pinned")
     private boolean pinned; // sets element as pinned
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "element_id", unique = true, nullable = false)
-    private int id; // element id
+    private long id; // element id
 
     @Column(name = "element_type")
     @Enumerated(EnumType.STRING)
     private ElementType elementType;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Fetch(FetchMode.SELECT)
-    @PrimaryKeyJoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+//    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+////    @Fetch(FetchMode.JOIN)
+//    @PrimaryKeyJoinColumn
+    @JoinColumn(name = "author_user_id", referencedColumnName = "user_id", updatable = false, insertable = false)
     private GeneralUser author; // element author
 
-
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Fetch(FetchMode.SELECT)
-    @PrimaryKeyJoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+//    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+//    @PrimaryKeyJoinColumn
+    @JoinColumn(name = "editor_user_id", referencedColumnName = "user_id", updatable = false, insertable = false)
     private GeneralUser editor; // element editor
 
     @Column(name = "element_creation_date")
@@ -53,7 +57,7 @@ public abstract class AbstractForumElement implements Serializable {
         this.elementType = elementType;
     }
 
-    public abstract Set<Integer> getParents();
+    public abstract Set<Long> getParents();
 
     public GeneralUser getEditor() {
         return editor;
@@ -79,11 +83,11 @@ public abstract class AbstractForumElement implements Serializable {
         this.pinned = pinned;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

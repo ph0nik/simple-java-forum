@@ -37,7 +37,7 @@ public class StartController {
         // check if there's user with type admin
         ForumSection root = sectionService.getRootSection();
         if (root != null) {
-            modelAndView.addObject("root", root);
+            modelAndView.addObject("section", root);
             modelAndView.setViewName("section");
         } else {
             boolean adminPresent = userService.adminCheck();

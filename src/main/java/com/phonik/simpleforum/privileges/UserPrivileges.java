@@ -2,21 +2,24 @@ package com.phonik.simpleforum.privileges;
 
 import com.phonik.simpleforum.BanTimeCounter;
 import com.phonik.simpleforum.users.GeneralUser;
+import com.phonik.simpleforum.users.UserType;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "privileges")
+@Table(name = "privileges_definition")
 public class UserPrivileges implements Serializable {
 
+    //TODO change privileges model to map <scope, PRIV_TYPE>, where
+    // PRIV_TYPE (enum) will point to specific set of rules
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "priv_id")
     private int id;
-    @Column(name = "priv_scope")
-    private int privilegesScope;
+    @Column(name = "priv_usertype")
+    private UserType userType;
     @Column(name = "priv_new_post")
     private boolean createNewPost;
     @Column(name = "priv_new_reply")
@@ -45,10 +48,6 @@ public class UserPrivileges implements Serializable {
     public UserPrivileges() {
     }
 
-    protected UserPrivileges(int privilegesScope) {
-        this.privilegesScope = privilegesScope;
-    }
-
     public GeneralUser getUser() {
         return user;
     }
@@ -63,14 +62,6 @@ public class UserPrivileges implements Serializable {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getPrivilegesScope() {
-        return privilegesScope;
-    }
-
-    public void setPrivilegesScope(int privilegesScope) {
-        this.privilegesScope = privilegesScope;
     }
 
     public boolean isCreateNewPost() {
@@ -165,7 +156,6 @@ public class UserPrivileges implements Serializable {
     public String toString() {
         return "UserPrivileges{" +
                 "id=" + id +
-                ", privilegesScope=" + privilegesScope +
                 ", createNewPost=" + createNewPost +
                 ", createNewReply=" + createNewReply +
                 ", createNewSection=" + createNewSection +

@@ -9,16 +9,16 @@ public interface ForumElementDao {
 
     ForumSection getRoot();
 
-    int addForumElement(AbstractForumElement forumElement);
+    long addForumElement(AbstractForumElement forumElement);
 
     void updateForumElement(AbstractForumElement forumElement);
 
     void deleteForumElement(AbstractForumElement forumElement);
 
-    ForumSection getForumSection(int id);
+    ForumSection getForumSection(long id);
 
-    ForumPost getForumPost(int id);
+    ForumPost getForumPost(long id);
 
-    ForumReply getForumReply(int id);
+    ForumReply getForumReply(long id);
 
 }

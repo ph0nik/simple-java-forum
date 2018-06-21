@@ -2,8 +2,8 @@ package com.phonik.simpleforum.privileges;
 
 public class ModeratorPrivileges extends UserPrivileges {
 
-    public ModeratorPrivileges(int privilegesScope) {
-        super(privilegesScope);
+    public ModeratorPrivileges() {
+        super();
         setCreateNewPost(true);
         setCreateNewSection(true);
         setCreateNewReply(true);

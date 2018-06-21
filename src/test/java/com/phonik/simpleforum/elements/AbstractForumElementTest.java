@@ -1,10 +1,7 @@
 package com.phonik.simpleforum.elements;
 
 import com.phonik.simpleforum.elements.service.SectionService;
-import com.phonik.simpleforum.elements.service.SectionServiceImpl;
 import com.phonik.simpleforum.exceptions.UserPrivilegesException;
-import com.phonik.simpleforum.privileges.AdminPrivileges;
-import com.phonik.simpleforum.privileges.ModeratorPrivileges;
 import com.phonik.simpleforum.privileges.service.ValidateUser;
 import com.phonik.simpleforum.privileges.service.ValidateUserImpl;
 import com.phonik.simpleforum.users.GeneralUser;
@@ -24,12 +21,12 @@ public class AbstractForumElementTest {
     public void initTestSuite() {
         admin = new GeneralUser();
         admin.setUserType(UserType.ADMIN);
-        admin.setUserPrivileges(new AdminPrivileges());
+//        admin.setUserPrivileges(new AdminPrivileges());
         admin.setUserName("Forum Admin");
         admin.setUserPassword("very_secret");
         admin.setUserMail("boss@ms.com");
         validateUser = new ValidateUserImpl();
-        sectionService = new SectionServiceImpl();
+        sectionService = new SectionService();
     }
 
 
@@ -89,21 +86,21 @@ public class AbstractForumElementTest {
         assertFalse(validateUser.canCreateNewSection(user, filmy));
 
         // promote user to moderator within given forum scope
-        user.setUserPrivileges(new ModeratorPrivileges(filmy.getId()));
+//        user.setUserPrivileges(new ModeratorPrivileges(filmy.getId()));
 
         // check if he can now create sections
         assertTrue(validateUser.canCreateNewSection(user, filmy));
         assertTrue(validateUser.canDeleteReply(user, matrix1));
 
         // demote user given forum scope
-        user.removePrivileges(filmy);
+//        user.removePrivileges(filmy);
         assertFalse(validateUser.canCreateNewSection(user, filmy));
     }
 
     @Test
     public void sectionFactory() throws UserPrivilegesException {
         ForumSection root = sectionService.createRoot("Tytuł forum", "opis forum", admin);
-        sectionService.addNewSection("filmy", "dyskusja o filmach", admin, root);
+        sectionService.addNewSection("filmy", "dyskusja o filmach", admin, 0);
     }
 
 }

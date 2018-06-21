@@ -1,15 +1,12 @@
 package com.phonik.simpleforum.dao;
 
-import com.phonik.simpleforum.configuration.HibernateConfiguration;
 import com.phonik.simpleforum.elements.ForumSection;
 import com.phonik.simpleforum.elements.service.SectionService;
-import com.phonik.simpleforum.elements.service.SectionServiceImpl;
 import com.phonik.simpleforum.exceptions.EmailExistException;
 import com.phonik.simpleforum.exceptions.EmptyFieldsException;
 import com.phonik.simpleforum.exceptions.UserPrivilegesException;
 import com.phonik.simpleforum.users.GeneralUser;
 import com.phonik.simpleforum.users.service.UserService;
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +18,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {SectionServiceImpl.class,
+@ContextConfiguration(classes = {SectionService.class,
         ForumElementDaoImpl.class,
         UserDaoImpl.class,
         UserService.class})
@@ -38,9 +35,9 @@ public class ForumElementDaoImplTest {
 
     private GeneralUser admin;
     private ForumSection root;
-    private int rootId;
+    private long rootId;
     private ForumSection filmy;
-    private int filmyId;
+    private long filmyId;
 
 
     @Before
@@ -48,7 +45,7 @@ public class ForumElementDaoImplTest {
         admin = userService.createNewAdmin("Skynet Admin", "youAREallGOINGtoDIE", "admin@skynet.com");
         root = sectionService.createRoot("Tytuł forum", "opis forum", admin);
         rootId = forumElementDao.addForumElement(root);
-        filmy = sectionService.addNewSection("filmy", "dyskusja o filmach", admin, root);
+        filmy = sectionService.addNewSection("filmy", "dyskusja o filmach", admin, 0);
         filmyId = forumElementDao.addForumElement(filmy);
     }
 

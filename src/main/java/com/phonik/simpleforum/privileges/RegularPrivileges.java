@@ -10,7 +10,7 @@ public class RegularPrivileges extends UserPrivileges {
 
     // TODO update new parameters
     public RegularPrivileges() {
-        super(ForumRoot.FORUM_ROOT_ID);
+        super();
         setCreateNewPost(true);
         setCreateNewSection(false);
         setCreateNewReply(true);

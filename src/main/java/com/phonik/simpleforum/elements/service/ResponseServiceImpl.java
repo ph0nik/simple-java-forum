@@ -26,7 +26,7 @@ public class ResponseServiceImpl implements ResponseService {
         ForumReply reply;
         if (valid.canCreateNewReply(user, parentPost)) {
             reply = new ForumReply(parentPost, replyContent, user);
-            int i = forumDao.addForumElement(reply);
+            long i = forumDao.addForumElement(reply);
             reply.setId(i);
             return parentPost;
         } else {
@@ -52,7 +52,7 @@ public class ResponseServiceImpl implements ResponseService {
     @Transactional
     public ForumPost deleteReply(int replyId, GeneralUser user) throws UserPrivilegesException {
         ForumReply fetchedReply = forumDao.getForumReply(replyId);
-        int parentId = fetchedReply.getParentPost().getId();
+        long parentId = fetchedReply.getParentPost().getId();
         if (valid.canDeleteReply(user, fetchedReply)) {
             forumDao.deleteForumElement(fetchedReply);
             return forumDao.getForumPost(parentId);

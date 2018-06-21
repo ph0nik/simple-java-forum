@@ -1,7 +1,5 @@
 package com.phonik.simpleforum.elements;
 
-import org.springframework.context.annotation.Configuration;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -12,61 +10,72 @@ import java.util.Comparator;
 public class PathElement implements Serializable, Comparator<PathElement> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "path_el_id", unique = true, nullable = false)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "path_id", unique = true, nullable = false)
+    private long id;
+
+    @Column(name = "path_el_id")
+    private long pathElementId;
 
     @Column(name = "path_el_name")
-    private String name;
+    private String pathElementName;
 
     @Column(name = "path_el_date")
-    private LocalDateTime creationDate;
+    private LocalDateTime pathElementCreationDate;
 
-    public PathElement(){};
+    public PathElement(){}
 
-    public PathElement(int id, String name, LocalDateTime creationDate) {
-        this.id = id;
-        this.name = name;
-        this.creationDate = creationDate;
+    public PathElement(long id, String name, LocalDateTime creationDate) {
+        this.pathElementId = id;
+        this.pathElementName = name;
+        this.pathElementCreationDate = creationDate;
     }
 
-    public int getId() {
+    public long getPathElementId() {
+        return pathElementId;
+    }
+
+    public void setPathElementId(long pathElementId) {
+        this.pathElementId = pathElementId;
+    }
+
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getPathElementName() {
+        return pathElementName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setPathElementName(String pathElementName) {
+        this.pathElementName = pathElementName;
     }
 
-    public LocalDateTime getCreationDate() {
-        return creationDate;
+    public LocalDateTime getPathElementCreationDate() {
+        return pathElementCreationDate;
     }
 
-    public void setCreationDate(LocalDateTime creationDate) {
-        this.creationDate = creationDate;
+    public void setPathElementCreationDate(LocalDateTime pathElementCreationDate) {
+        this.pathElementCreationDate = pathElementCreationDate;
     }
 
     @Override
     public String toString() {
         return "PathElement{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
-                ", creationDate=" + creationDate +
+                ", pathElementName='" + pathElementName + '\'' +
+                ", pathElementCreationDate=" + pathElementCreationDate +
                 '}';
     }
 
     @Override
     public int compare(PathElement o1, PathElement o2) {
-        return (o1.creationDate.equals(o2.creationDate))
-                ? o1.name.compareTo(o2.name)
-                : o1.creationDate.compareTo(o2.creationDate);
+        return (o1.pathElementCreationDate.equals(o2.pathElementCreationDate))
+                ? o1.pathElementName.compareTo(o2.pathElementName)
+                : o1.pathElementCreationDate.compareTo(o2.pathElementCreationDate);
     }
 }

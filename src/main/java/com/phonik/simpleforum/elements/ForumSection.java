@@ -9,14 +9,13 @@ import java.util.*;
 @Table(name = "forum_section")
 public class ForumSection extends AbstractForumElement {
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "sections_list", joinColumns = @JoinColumn(name = "section_parent_id"), inverseJoinColumns = @JoinColumn(name = "section_child_id"))
+    private List<ForumSection> sectionsList;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "path_list", joinColumns = @JoinColumn(name = "target_element_id"), inverseJoinColumns = @JoinColumn(name = "path_element_id"))
     private List<PathElement> elementPath;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "sections_list", joinColumns = @JoinColumn(name = "section_parent_id"), inverseJoinColumns = @JoinColumn(name = "section_child_id"))
-    private List<ForumSection> sectionsList;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "post_list", joinColumns = @JoinColumn(name = "section_id"), inverseJoinColumns = @JoinColumn(name = "post_id"))
@@ -64,8 +63,8 @@ public class ForumSection extends AbstractForumElement {
      *
      * @return HashSet of identifiers
      */
-    public Set<Integer> getParents() {
-        Set<Integer> parents = new HashSet<>();
+    public Set<Long> getParents() {
+        Set<Long> parents = new HashSet<>();
         for (PathElement pe : this.elementPath) {
             parents.add(pe.getId());
         }
@@ -124,8 +123,8 @@ public class ForumSection extends AbstractForumElement {
     public void addCurrentToElementPath() {
         PathElement pathElement = new PathElement();
         pathElement.setId(this.getId());
-        pathElement.setName(this.title);
-        pathElement.setCreationDate(this.getCreationDate());
+        pathElement.setPathElementName(this.title);
+        pathElement.setPathElementCreationDate(this.getCreationDate());
         this.elementPath.add(pathElement);
     }
 

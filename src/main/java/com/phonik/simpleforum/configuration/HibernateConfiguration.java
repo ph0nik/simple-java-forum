@@ -45,6 +45,11 @@ public class HibernateConfiguration {
     @Value("${entitymanager.packagesToScan}")
     private String packagesToScan;
 
+    // allows hibernate to read predefined multiline sql statements from external file
+    // by default hibernate expects them to be in single line
+    @Value("${hibernate.hbm2ddl.import_files_sql_extractor}")
+    private String hbm2ddlLineExtractor;
+
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -63,6 +68,7 @@ public class HibernateConfiguration {
         Properties hibernateProperties = new Properties();
         hibernateProperties.put("hibernate.show_sql", showSql);
         hibernateProperties.put("hibernate.hbm2ddl.auto", hbm2ddlAuto);
+        hibernateProperties.put("hibernate.hbm2ddl.import_files_sql_extractor", hbm2ddlLineExtractor);
         hibernateProperties.put("hibernate.dialect", dialect);
         sessionFactory.setHibernateProperties(hibernateProperties);
         return sessionFactory;

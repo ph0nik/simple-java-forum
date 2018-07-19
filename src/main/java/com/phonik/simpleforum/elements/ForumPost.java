@@ -18,12 +18,11 @@ public class ForumPost extends AbstractForumElement implements Serializable, Com
     @Column(name = "post_content")
     private String content;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @PrimaryKeyJoinColumn
-    private ForumSection parentSection;
+    @ManyToOne
+    private ForumSection parentElement;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "reply_list", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "reply_id"))
+    // change to fit parent-child relation similar to forum section
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "parentPost", orphanRemoval = true)
     private List<ForumReply> postReplysList;
 
     // author, title, content, parent category, creation date, edit date
@@ -36,18 +35,18 @@ public class ForumPost extends AbstractForumElement implements Serializable, Com
         postReplysList = new ArrayList<>();
     }
 
-    public ForumPost(ForumSection parentSection, String title, String content, GeneralUser author) {
+    public ForumPost(ForumSection parentElement, String title, String content, GeneralUser author) {
         this();
         setAuthor(author);
         setElementType(ElementType.TOPIC);
         this.title = title;
         this.content = content;
-        this.parentSection = parentSection;
-        parentSection.addPost(this);
+        this.parentElement = parentElement;
+        parentElement.addPost(this);
     }
 
     public Set<Long> getParents() {
-        ForumSection parent = this.parentSection;
+        ForumSection parent = this.parentElement;
         Set<Long> parentSet = new TreeSet<>();
         parentSet.addAll(parent.getParents());
         parentSet.add(parent.getId());
@@ -84,13 +83,13 @@ public class ForumPost extends AbstractForumElement implements Serializable, Com
         this.content = content;
     }
 
-    public ForumSection getParentSection() {
-        return parentSection;
+    public ForumSection getParentElement() {
+        return parentElement;
     }
 
-    public void setParentSection(ForumSection parentSection) {
-        this.parentSection = parentSection;
-        parentSection.addPost(this);
+    public void setParentElement(ForumSection parentElement) {
+        this.parentElement = parentElement;
+        parentElement.addPost(this);
     }
 
     public List<ForumReply> getPostReplysList() {

@@ -4,25 +4,25 @@ import com.phonik.simpleforum.users.GeneralUser;
 
 import javax.persistence.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity(name = "ForumSection")
 @Table(name = "forum_section")
 public class ForumSection extends AbstractForumElement {
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "sections_list", joinColumns = @JoinColumn(name = "section_parent_id"), inverseJoinColumns = @JoinColumn(name = "section_child_id"))
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "parentElement", orphanRemoval = true)
     private List<ForumSection> sectionsList;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "path_list", joinColumns = @JoinColumn(name = "target_element_id"), inverseJoinColumns = @JoinColumn(name = "path_element_id"))
     private List<PathElement> elementPath;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "post_list", joinColumns = @JoinColumn(name = "section_id"), inverseJoinColumns = @JoinColumn(name = "post_id"))
+//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @JoinTable(name = "post_list", joinColumns = @JoinColumn(name = "section_id"), inverseJoinColumns = @JoinColumn(name = "post_id"))
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "parentElement", orphanRemoval = true)
     private List<ForumPost> postsList;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @PrimaryKeyJoinColumn
+    @ManyToOne
     private ForumSection parentElement;
 
     @Column(name = "section_title")
@@ -130,6 +130,14 @@ public class ForumSection extends AbstractForumElement {
 
     public List<PathElement> getElementPath() {
         return elementPath;
+    }
+
+    public List<PathElement> getElementPathAsc() {
+        return elementPath.stream().sorted(
+                Comparator.comparing(
+                        PathElement::getPathElementCreationDate)
+                        .thenComparing(PathElement::getPathElementName))
+                .collect(Collectors.toList());
     }
 
     public void setElementPath(List<PathElement> elementPath) {

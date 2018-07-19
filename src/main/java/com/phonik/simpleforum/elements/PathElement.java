@@ -7,7 +7,7 @@ import java.util.Comparator;
 
 @Entity(name = "PathElement")
 @Table(name = "path_element")
-public class PathElement implements Serializable, Comparator<PathElement> {
+public class PathElement implements Serializable, Comparable<PathElement>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,10 +72,12 @@ public class PathElement implements Serializable, Comparator<PathElement> {
                 '}';
     }
 
+
+    // TODO delete maybe (?)
     @Override
-    public int compare(PathElement o1, PathElement o2) {
-        return (o1.pathElementCreationDate.equals(o2.pathElementCreationDate))
-                ? o1.pathElementName.compareTo(o2.pathElementName)
-                : o1.pathElementCreationDate.compareTo(o2.pathElementCreationDate);
+    public int compareTo(PathElement o) {
+        return (this.pathElementCreationDate.equals(o.pathElementCreationDate))
+                ? this.pathElementName.compareTo(o.pathElementName)
+                : this.pathElementCreationDate.compareTo(o.pathElementCreationDate);
     }
 }

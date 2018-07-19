@@ -41,7 +41,6 @@ public class SectionController {
 //        } catch (NoSuchElementException ex) {
 //            System.out.println(ex.getMessage());
 //        }
-        System.out.println(forumSection.getTitle());
         model.setViewName("section");
         return model;
     }
@@ -52,18 +51,41 @@ public class SectionController {
     @GetMapping(value = "section/new")
     public ModelAndView newSectionForm(@RequestParam(value = "parent") final long parentId,
                                  ModelAndView model) {
-        // passing forward parent element id
-        model.addObject("parentSection", parentId);
+        // get parent element object and pass it to jsp file
+        ForumSection parentSection = sectionService.getSection(parentId);
+        model.addObject("parentSection", parentSection);
         model.setViewName("new_section");
         return model;
     }
 
+    // temp user
     private GeneralUser testUser() {
         return userService.getUserWithId(1);
     }
 
-    // TODO user object passed as parameter to create new element collides with user existing in db
+    /**
+     * new section post controller
+     * */
     @PostMapping(value = "section/new")
+    public String addNewSection(@RequestParam(value = "parentId") final int parentId,
+                                @RequestParam(value = "title") final String title,
+                                @RequestParam(value = "description") final String description) throws UserPrivilegesException {
+        ForumSection forumSection = sectionService.addNewSection(title, description, testUser(), parentId);
+        return "redirect:/section/" + forumSection.getId();
+    }
+
+    /**
+     * get controller for deleting selected section
+     * */
+    @GetMapping(value = "section/delete")
+    public String deleteSection(@RequestParam(value = "sectionId") final int sectionId) throws UserPrivilegesException {
+        ForumSection parentSection = sectionService.deleteSection(sectionId, testUser());
+        return "redirect:/section/" + parentSection.getId();
+    }
+
+    // TODO pass parent id as path argument, makes it independent of session
+    // TODO user object passed as parameter to create new element collides with user existing in db
+/*    @PostMapping(value = "section/new")
     public String submitNewSection(@RequestParam(value = "title") final String title,
                                    @RequestParam(value = "description") final String description,
                                    @RequestParam(value = "parent") final long parentId,
@@ -74,7 +96,7 @@ public class SectionController {
 //
 //        System.out.println(description);
         return "redirect:/section/" + forumSection.getId();
-    }
+    }*/
 
     @GetMapping(value = "welcome")
     public String hello() {

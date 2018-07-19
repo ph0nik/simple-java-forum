@@ -134,6 +134,8 @@ public class UserService implements BanService {
         return userDao.selectByEmail(email);
     }
 
+    // TODO delegate automatic unbaning to separate service that scans db periodically
+    // and changes user status
     @Override
     public void banUser(GeneralUser user, int months, int days, int hours) {
         LocalDateTime expDate = LocalDateTime.now()

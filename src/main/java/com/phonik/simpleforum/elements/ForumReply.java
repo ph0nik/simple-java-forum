@@ -13,8 +13,7 @@ public class ForumReply extends AbstractForumElement {
     @Column(name = "reply_content")
     private String content;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @PrimaryKeyJoinColumn
+    @ManyToOne
     private ForumPost parentPost;
 
     public ForumReply() {

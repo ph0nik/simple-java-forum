@@ -90,6 +90,7 @@ public class ValidateUserImpl implements ValidateUser {
                                            Function<UserPrivileges, Boolean> function) {
         sectionPath = new HashSet<>(forumElement.getParents());
         sectionPath.add(forumElement.getId());
+        // temporarily all requests return true
         return true;
 //        return sectionPath.stream()
 //                .filter(id -> user.getUserPrivilegesMap().containsKey(id))

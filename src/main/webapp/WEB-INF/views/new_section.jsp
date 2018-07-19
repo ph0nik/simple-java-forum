@@ -28,19 +28,37 @@ pageEncoding="ISO-8859-1"%>
         <div class="col-sm-12">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item"><a href="#">Library</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Data</li>
+                    <c:set var="maxIndex" scope="page" value="${parentSection.getElementPathAsc().size()}"/>
+                    <c:if test="${parentSection.getElementPathAsc().isEmpty()}">
+                        <li class="breadcrumb-item"><a href="/forum">Home page</a></li>
+                    </c:if>
+                    <c:forEach var="path" items="${parentSection.getElementPathAsc()}">
+                        <c:set var="elementIndex" scope="page" value="${parentSection.getElementPathAsc().indexOf(path)}"/>
+                        <c:if test="${elementIndex == 0}">
+                            <li class="breadcrumb-item">
+                                <a href="/forum">Home page</a>
+                            </li>
+                        </c:if>
+
+                        <c:if test="${elementIndex > 0 && elementIndex < maxIndex}">
+                            <li class="breadcrumb-item">
+                                <a href="/section/${path.pathElementId}">${path.pathElementName}</a>
+                            </li>
+                        </c:if>
+                    </c:forEach>
+                    <li class="breadcrumb-item">
+                        <a href="/section/${parentSection.id}">${parentSection.title}</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Add new section</li>
                 </ol>
             </nav>
         </div>
     </div>
 
-    <form method="post" action="/section/new" id="newsection">
+    <form method="post" action="/section/new?parentId=${parentSection.id}" id="newsection">
         Section title:<br>
         <input type="text" name="title" required placeholder="What's this section title?"><br>
         Section description<br>
-        <input type="hidden" name="parent" value="${parentSection}">
         <textarea form_id="newsection" required cols="100" rows="5" placeholder="What's the topic of this section?"
                   name="description"></textarea><br>
         <input type="submit">

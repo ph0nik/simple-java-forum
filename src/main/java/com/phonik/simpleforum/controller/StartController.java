@@ -38,7 +38,8 @@ public class StartController {
         ForumSection root = sectionService.getRootSection();
         if (root != null) {
             modelAndView.addObject("section", root);
-            modelAndView.setViewName("section");
+//            modelAndView.setViewName("section");
+            modelAndView.setViewName("redirect:/section/" + root.getId());
         } else {
             boolean adminPresent = userService.adminCheck();
             if (adminPresent) {

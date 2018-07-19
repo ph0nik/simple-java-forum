@@ -127,12 +127,8 @@ public class SectionService {
                               GeneralUser user) throws UserPrivilegesException {
         ForumSection fetchedSectionId = forumDao.getForumSection(sectionId);
         long parentId = fetchedSectionId.getParentElement().getId();
-        if (valid.canDeleteSection(user, fetchedSectionId.getParentElement())) {
-            forumDao.deleteForumElement(fetchedSectionId);
-            return forumDao.getForumSection(parentId);
-        } else {
-            throw new UserPrivilegesException("You have no permission to do this.");
-        }
+        forumDao.deleteForumElement(fetchedSectionId);
+        return forumDao.getForumSection(parentId);
     }
 
 }
